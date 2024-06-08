@@ -8,10 +8,35 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(dbgenerated("gen_random_uuid()"))
-  email    String  @unique
-  name     String?
-  password String
+  id         String @id @default(dbgenerated("gen_random_uuid()"))
+  email      String @unique
+  first_name String
+  last_name  String
+  username   String @unique
+  password   String
+  tasks      Task[]
 
   @@map("users")
+}
+
+model Task {
+  id          String     @id @default(dbgenerated("gen_random_uuid()"))
+  title       String
+  description String
+  status      TaskStatus @default(PENDING)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  creator    User?   @relation(fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  creator_id String?
+
+  @@map("tasks")
+}
+
+//==============================================================================
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
 }
