@@ -2,7 +2,7 @@
 
 import { scryptSync, timingSafeEqual } from 'crypto';
 
-export class Password {
+export class PasswordTool {
   static hashPassword(password: string): string {
     return scryptSync(password, process.env.ENCRYPTION_KEY, 64).toString('hex');
   }
