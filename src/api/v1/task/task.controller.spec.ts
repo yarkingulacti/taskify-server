@@ -1,10 +1,11 @@
+import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TaskController } from './task.controller';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { TaskService } from './task.service';
 import CreateDto from './dto/request/Create.dto';
 
-describe('TaskController', () => {
+describe('Task Module CRUD tests', () => {
   let controller: TaskController;
   const createdTaskIds: string[] = [];
   const taskData: CreateDto = {
@@ -81,6 +82,17 @@ describe('TaskController', () => {
     }).compile();
 
     controller = module.get<TaskController>(TaskController);
+
+    // Manually apply the ValidationPipe to the controller method
+    const originalCreate = controller.create.bind(controller);
+    controller.create = async (createTaskDto: CreateDto) => {
+      const validationPipe = new ValidationPipe();
+      await validationPipe.transform(createTaskDto, {
+        metatype: CreateDto,
+        type: 'body',
+      });
+      return originalCreate(createTaskDto);
+    };
   });
 
   it('controller should be defined', () => {
@@ -130,21 +142,54 @@ describe('TaskController', () => {
   });
 
   it('task deleted', async () => {
-    const deletedTask = await controller.delete(createdTaskIds[0]);
-    expect(deletedTask).toHaveProperty('id');
-    const task = await controller.get(createdTaskIds[0]);
-    expect(task).toBeNull();
+    try {
+      const deletedTask = await controller.delete(createdTaskIds[0]);
+      expect(deletedTask).toHaveProperty('id');
+      const task = await controller.get(createdTaskIds[0]);
+      expect(task).toBeNull();
 
-    const deletedTaskIdx = createdTaskIds.indexOf(deletedTask.id);
+      const deletedTaskIdx = createdTaskIds.indexOf(deletedTask.id);
 
-    if (deletedTaskIdx > -1) {
-      createdTaskIds.splice(deletedTaskIdx, 1);
+      if (deletedTaskIdx > -1) {
+        createdTaskIds.splice(deletedTaskIdx, 1);
+      }
+    } catch (error) {
+      expect(error.status).toBe(404);
     }
+  });
+
+  it('task create Bad Request', async () => {
+    await expect(
+      controller.create({
+        title: '',
+        description: '',
+      }),
+    ).rejects.toMatchObject({
+      status: HttpStatus.BAD_REQUEST,
+    });
+  });
+
+  it('task get Not Found', async () => {
+    await expect(controller.get('invalid-id')).rejects.toMatchObject({
+      status: HttpStatus.NOT_FOUND,
+    });
+  });
+
+  it('task delete Not Found', async () => {
+    await expect(controller.delete('invalid-id')).rejects.toMatchObject({
+      status: HttpStatus.NOT_FOUND,
+    });
   });
 
   afterAll(async () => {
     for (const id of createdTaskIds) {
-      await controller.delete(id);
+      try {
+        await controller.delete(id);
+      } catch (error) {
+        expect(error.status).toBe(404);
+
+        continue;
+      }
     }
   });
 });

@@ -4,6 +4,6 @@ import { HistoryService } from './history.service';
 
 @Module({
   controllers: [HistoryController],
-  providers: [HistoryService]
+  providers: [HistoryService],
 })
 export class HistoryModule {}

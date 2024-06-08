@@ -8,16 +8,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.useGlobalFilters(new GlobalExceptionsFilter());
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
-  );
+  app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: process.env.APP_CORS_ORIGINS.split('|'),
   });
