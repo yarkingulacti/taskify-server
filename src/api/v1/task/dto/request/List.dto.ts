@@ -1,4 +1,4 @@
-import { Transform } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { IsOptional, IsString, Min, Max } from 'class-validator';
 
 export default class {
@@ -7,13 +7,13 @@ export default class {
   search?: string;
 
   @IsOptional()
+  @Type(() => Number)
   @Min(0)
   @Max(100)
-  @Transform(({ value }) => parseInt(value, 10))
   take?: number;
 
   @IsOptional()
+  @Type(() => Number)
   @Min(0)
-  @Transform(({ value }) => parseInt(value, 10))
   skip?: number;
 }

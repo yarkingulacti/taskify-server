@@ -25,7 +25,7 @@ export class TaskController {
     return this.service.create(data);
   }
 
-  @Get(':id')
+  @Get(':id/single')
   async get(@Param('id', ParseUUIDPipe) id: string): Promise<TaskDto> {
     return this.service.get(id);
   }

@@ -1,11 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { GlobalExceptionsFilter } from './filters/GlobalExceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api');
+  app.useGlobalFilters(new GlobalExceptionsFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
