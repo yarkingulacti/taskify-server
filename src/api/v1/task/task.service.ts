@@ -10,7 +10,22 @@ export class TaskService {
 
   async create(data: CreateDto) {
     return this.prisma.task.create({
-      data,
+      data: {
+        ...data,
+        creator: {
+          connect: {
+            id: (await this.prisma.user.findFirst()).id,
+          },
+        },
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
     });
   }
 
@@ -21,6 +36,14 @@ export class TaskService {
     return this.prisma.task.findFirst({
       where: {
         id,
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
       },
     });
   }
@@ -35,6 +58,14 @@ export class TaskService {
     return this.prisma.task.delete({
       where: {
         id,
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
       },
     });
   }
@@ -51,6 +82,14 @@ export class TaskService {
         id,
       },
       data,
+      include: {
+        creator: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
     });
   }
 
@@ -75,6 +114,14 @@ export class TaskService {
               },
             ]
           : undefined,
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
       },
     });
   }
