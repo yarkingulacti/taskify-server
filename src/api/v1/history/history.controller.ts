@@ -1,4 +1,4 @@
 import { Controller } from '@nestjs/common';
 
-@Controller('history')
+@Controller()
 export class HistoryController {}

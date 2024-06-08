@@ -8,13 +8,15 @@ datasource db {
 }
 
 model User {
-  id         String @id @default(dbgenerated("gen_random_uuid()"))
-  email      String @unique
+  id         String   @id @default(dbgenerated("gen_random_uuid()"))
+  email      String   @unique
   first_name String
   last_name  String
-  username   String @unique
+  username   String   @unique
   password   String
-  tasks      Task[]
+  created_at DateTime @default(now())
+
+  tasks Task[]
 
   @@map("users")
 }
@@ -27,10 +29,24 @@ model Task {
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
 
-  creator    User?   @relation(fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  creator    User?         @relation(fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   creator_id String?
+  histories  TaskHistory[]
 
   @@map("tasks")
+}
+
+model TaskHistory {
+  id             String            @id @default(dbgenerated("gen_random_uuid()"))
+  old_value      String
+  new_value      String
+  changed_column TaskHistoryColumn
+  created_at     DateTime          @default(now())
+
+  task    Task   @relation(fields: [task_id], references: [id])
+  task_id String
+
+  @@map("task_histories")
 }
 
 //==============================================================================
@@ -39,4 +55,10 @@ enum TaskStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
+}
+
+enum TaskHistoryColumn {
+  TITLE
+  DESCRIPTION
+  STATUS
 }
