@@ -88,10 +88,13 @@ describe('TaskController', () => {
   });
 
   it('task retreived', async () => {
-    const task = await controller.get(createdTaskIds[0]);
+    const created = await controller.create(taskData);
+    const task = await controller.get(created.id);
     expect(task).toHaveProperty('id');
     expect(task.title).toBe(taskData.title);
     expect(task.description).toBe(taskData.description);
+
+    createdTaskIds.push(created.id);
   });
 
   it('another task created', async () => {
@@ -111,9 +114,9 @@ describe('TaskController', () => {
 
     const tasks = await controller.list({
       take: 10,
-      skip: 3,
+      skip: 1,
     });
-    expect(tasks.length).not.toBe(10);
+    expect(tasks.length).toBe(10);
   });
 
   it('task updated', async () => {
@@ -131,6 +134,12 @@ describe('TaskController', () => {
     expect(deletedTask).toHaveProperty('id');
     const task = await controller.get(createdTaskIds[0]);
     expect(task).toBeNull();
+
+    const deletedTaskIdx = createdTaskIds.indexOf(deletedTask.id);
+
+    if (deletedTaskIdx > -1) {
+      createdTaskIds.splice(deletedTaskIdx, 1);
+    }
   });
 
   afterAll(async () => {
