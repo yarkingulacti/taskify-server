@@ -74,7 +74,7 @@ describe('TaskController', () => {
     },
   ];
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TaskController],
       providers: [TaskService, PrismaService],
