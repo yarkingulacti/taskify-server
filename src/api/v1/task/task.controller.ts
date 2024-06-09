@@ -52,7 +52,7 @@ export class TaskController {
 
     res.items = items;
     res.meta = {
-      currentPage: query.skip / query.take + 1,
+      currentPage: Math.floor(query.skip / query.take) + 1,
       totalPages: Math.ceil(totalCount / query.take),
       currentPageSize: items.length,
       totalItemsCount: totalCount,
