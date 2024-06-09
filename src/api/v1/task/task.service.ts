@@ -94,35 +94,57 @@ export class TaskService {
   }
 
   async list(query: ListDto) {
-    return this.prisma.task.findMany({
-      skip: query.skip || 0,
-      take: query.take || 10,
-      where: {
-        OR: query.search
-          ? [
-              {
-                title: {
-                  contains: query.search,
-                  mode: 'insensitive',
+    return this.prisma.$transaction([
+      this.prisma.task.findMany({
+        skip: query.skip || 0,
+        take: query.take || 10,
+        where: {
+          OR: query.search
+            ? [
+                {
+                  title: {
+                    contains: query.search,
+                    mode: 'insensitive',
+                  },
                 },
-              },
-              {
-                description: {
-                  contains: query.search,
-                  mode: 'insensitive',
+                {
+                  description: {
+                    contains: query.search,
+                    mode: 'insensitive',
+                  },
                 },
-              },
-            ]
-          : undefined,
-      },
-      include: {
-        creator: {
-          select: {
-            id: true,
-            username: true,
+              ]
+            : undefined,
+        },
+        include: {
+          creator: {
+            select: {
+              id: true,
+              username: true,
+            },
           },
         },
-      },
-    });
+      }),
+      this.prisma.task.count({
+        where: {
+          OR: query.search
+            ? [
+                {
+                  title: {
+                    contains: query.search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  description: {
+                    contains: query.search,
+                    mode: 'insensitive',
+                  },
+                },
+              ]
+            : undefined,
+        },
+      }),
+    ]);
   }
 }

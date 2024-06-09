@@ -15,6 +15,7 @@ import CreateDto from './dto/request/Create.dto';
 import TaskDto from './dto/response/Task.dto';
 import UpdateDto from './dto/request/Update.dto';
 import ListDto from './dto/request/List.dto';
+import { PaginationResponse } from '../common/dto/PaginationResponse.dto';
 
 @Controller()
 export class TaskController {
@@ -44,7 +45,19 @@ export class TaskController {
   }
 
   @Get('list')
-  async list(@Query() query: ListDto): Promise<TaskDto[]> {
-    return this.service.list(query);
+  async list(@Query() query: ListDto): Promise<PaginationResponse<TaskDto>> {
+    const [items, totalCount] = await this.service.list(query);
+
+    const res = new PaginationResponse<TaskDto>();
+
+    res.items = items;
+    res.meta = {
+      currentPage: query.skip / query.take + 1,
+      totalPages: Math.ceil(totalCount / query.take),
+      currentPageSize: items.length,
+      totalItemsCount: totalCount,
+    };
+
+    return res;
   }
 }

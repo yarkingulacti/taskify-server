@@ -128,7 +128,21 @@ describe('Task Module CRUD tests', () => {
       take: 10,
       skip: 1,
     });
-    expect(tasks.length).toBe(10);
+    expect(tasks.items.length).toBe(10);
+  });
+
+  it('task list total page greater then 1', async () => {
+    for (const index in taskList) {
+      const { id } = await controller.create(taskList[index]);
+      createdTaskIds.push(id);
+    }
+
+    const tasks = await controller.list({
+      take: 10,
+      skip: 1,
+    });
+
+    expect(tasks.meta.totalPages).toBeGreaterThan(1);
   });
 
   it('task updated', async () => {
@@ -186,7 +200,7 @@ describe('Task Module CRUD tests', () => {
       try {
         await controller.delete(id);
       } catch (error) {
-        expect(error.status).toBe(404);
+        expect(error.status).toBe(HttpStatus.NOT_FOUND);
 
         continue;
       }
