@@ -103,6 +103,7 @@ describe('Task Module CRUD tests', () => {
     const created = await controller.create(taskData);
     const task = await controller.get(created.id);
     expect(task).toHaveProperty('id');
+    expect(task.id).toBe(created.id);
     expect(task.title).toBe(taskData.title);
     expect(task.description).toBe(taskData.description);
 
