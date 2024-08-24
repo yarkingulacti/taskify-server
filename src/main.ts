@@ -48,7 +48,7 @@ async function bootstrap() {
       logger.error('💩 Default user creation failed. Error: ', error);
     });
 
-  await app.listen(process.env.APP_PORT, process.env.APP_HOSTNAME);
+  await app.listen(process.env.APP_PORT);
 
   logger.verbose(`======================================================`);
   logger.verbose(`   🚀 Server is running 🚀`);
