@@ -26,7 +26,7 @@ export class TaskController {
     return this.service.create(data);
   }
 
-  @Get(':id/single')
+  @Get(':id')
   async get(@Param('id', ParseUUIDPipe) id: string): Promise<TaskDto> {
     return this.service.get(id);
   }
@@ -44,7 +44,7 @@ export class TaskController {
     return this.service.update(id, data);
   }
 
-  @Get('list')
+  @Get()
   async list(@Query() query: ListDto): Promise<PaginationResponse<TaskDto>> {
     const [items, totalCount] = await this.service.list(query);
 
