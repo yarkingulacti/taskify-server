@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
-import { GlobalExceptionsFilter } from './filters/GlobalExceptions.filter';
-import { PasswordTool } from './helpers/password.helper';
+import { urlencoded, json } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { GlobalExceptionsFilter } from './filters/GlobalExceptions.filter';
+import { AppModule } from './app.module';
+import { PasswordTool } from './helpers/password.helper';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,6 +25,8 @@ async function bootstrap() {
     prefix: 'v',
     defaultVersion: '1',
   });
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   const db = new PrismaClient();
 
