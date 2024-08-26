@@ -3,6 +3,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import CreateDto from './dto/request/Create.dto';
 import UpdateDto from './dto/request/Update.dto';
 import ListDto from './dto/request/List.dto';
+import { TaskStatus } from '@prisma/client';
 
 @Injectable()
 export class TaskService {
@@ -82,6 +83,32 @@ export class TaskService {
         id,
       },
       data,
+      include: {
+        creator: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+  }
+
+  async updateStatus(id: string, status: TaskStatus) {
+    if ((await this.get(id)) === null)
+      throw new HttpException(
+        'Task to be updated not found',
+        HttpStatus.NOT_FOUND,
+      );
+
+    return this.prisma.task.update({
+      where: {
+        id,
+      },
+      data: {
+        status,
+        updated_at: new Date(),
+      },
       include: {
         creator: {
           select: {

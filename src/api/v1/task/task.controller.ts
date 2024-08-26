@@ -5,6 +5,7 @@ import {
   Get,
   Inject,
   Param,
+  ParseEnumPipe,
   ParseUUIDPipe,
   Post,
   Put,
@@ -16,6 +17,7 @@ import TaskDto from './dto/response/Task.dto';
 import UpdateDto from './dto/request/Update.dto';
 import ListDto from './dto/request/List.dto';
 import { PaginationResponse } from '../common/dto/PaginationResponse.dto';
+import { TaskStatus } from '@prisma/client';
 
 @Controller()
 export class TaskController {
@@ -42,6 +44,14 @@ export class TaskController {
     @Body() data: UpdateDto,
   ): Promise<TaskDto> {
     return this.service.update(id, data);
+  }
+
+  @Put(':id/status')
+  async updateStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body('status', new ParseEnumPipe(TaskStatus)) status: TaskStatus,
+  ): Promise<TaskDto> {
+    return this.service.updateStatus(id, status);
   }
 
   @Get()
